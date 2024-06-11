@@ -4,13 +4,6 @@
   export let path = ''
 
   let invalid = ''
-  let disabled = !path
-
-  type InputEvent = Event & { currentTarget: EventTarget & HTMLInputElement }
-  function handleInput(event: InputEvent) {
-    path = event.currentTarget.value
-    disabled = !path
-  }
 
   function handleSubmit(event: SubmitEvent) {
     const data = new FormData(event.target as HTMLFormElement)
@@ -34,9 +27,9 @@
 >
   <label>
     Path to Apple Health export.xml
-    <input name="path" on:input={handleInput} value={path} />
+    <input name="path" value={path} />
   </label>
-  <button {disabled} type="submit">Load data</button>
+  <button type="submit">Load data</button>
   {#if invalid}
     <p>{invalid}</p>
   {/if}

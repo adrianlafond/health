@@ -1,15 +1,13 @@
-import type { Health, User } from '$lib/types/health';
+import type { Health, HealthError, User } from '$lib/types/health';
 import type { AppleHealth, Me } from './apple-health.types';
 import { parseString as parseXml } from 'xml2js'
 
 /**
  * Converts an export XML file from Apple Health to a Health object.
  */
-export async function appleToHealth(xml: string): Promise<Health> {
-  const json: AppleHealth = await parseXmlToJson(xml)
-  console.log(json.ExportDate);
-
-  return {
+export async function appleToHealth(xml: string): Promise<Health | HealthError> {
+  const json: AppleHealth | HealthError = await parseXmlToJson(xml)
+  return 'error' in json ? json : {
     error: false,
     date: new Date(json.ExportDate[0].$.value),
     user: getUser(json.Me[0].$)
@@ -50,18 +48,26 @@ function getUser(user: Me): User {
   }
 }
 
-function parseXmlToJson(xml: string): Promise<AppleHealth> {
-  return new Promise((resolve, reject) => {
+function parseXmlToJson(xml: string): Promise<AppleHealth | HealthError> {
+  let errorMessage = 'XML could not be transformed'
+  return new Promise((resolve) => {
     try {
       parseXml(xml, (error: Error | null, json: { HealthData: AppleHealth }) => {
+        errorMessage = error?.message || errorMessage
         if (error) {
-          reject(error)
+          resolve({
+            error: true,
+            message: errorMessage
+          })
         } else {
           resolve(json.HealthData)
         }
       })
-    } catch (error) {
-      reject(error)
+    } catch {
+      resolve({
+        error: true,
+        message: errorMessage
+      })
     }
   })
 }

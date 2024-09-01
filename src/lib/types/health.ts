@@ -20,9 +20,11 @@ export type HealthSuccess = {
   data: Health
 }
 
-export type HealthError = ActionFailure<{
+export type HealthError = {
   error: true
   message: string
-}>
+}
 
-export type HealthResponse = HealthSuccess | HealthError
+export type HealthFail= ActionFailure<HealthError>
+
+export type HealthResponse = HealthSuccess | HealthFail

@@ -1,3 +1,6 @@
 {
-	"/": []
+	"/": [],
+	"/apple": [
+		"src/routes/apple/+page.server.ts"
+	]
 }

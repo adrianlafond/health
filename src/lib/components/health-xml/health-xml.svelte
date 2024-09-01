@@ -1,36 +1,16 @@
-<script lang="ts">
-  import { EMPTY_PATH, INVALID_FILENAME } from './errors'
-
-  export let path = ''
-
-  let invalid = ''
-
-  function handleSubmit(event: SubmitEvent) {
-    const data = new FormData(event.target as HTMLFormElement)
-    const formPath = data.get('path')?.toString().trim() || ''
-    if (!formPath) {
-      invalid = EMPTY_PATH
-      event.preventDefault()
-    } else if (!formPath.endsWith('export.xml')) {
-      invalid = INVALID_FILENAME
-      event.preventDefault()
-    } else {
-      invalid = ''
-    }
-  }
+<script>
+  import { enhance } from '$app/forms'
 </script>
 
 <form
   method="POST"
-  action="/import-apple-health-export"
-  on:submit={handleSubmit}
+  action="/apple?/upload"
+  use:enhance
+  enctype="multipart/form-data"
 >
   <label>
-    Path to Apple Health export.xml
-    <input name="path" value={path} />
+    Apple Health "export.xml"
+    <input name="file" type="file" accept="xml" />
   </label>
   <button type="submit">Load data</button>
-  {#if invalid}
-    <p>{invalid}</p>
-  {/if}
 </form>

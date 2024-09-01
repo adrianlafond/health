@@ -10,7 +10,14 @@ export async function appleToHealth(xml: string): Promise<Health | HealthError> 
   return 'error' in json ? json : {
     error: false,
     date: new Date(json.ExportDate[0].$.value),
-    user: getUser(json.Me[0].$)
+    user: getUser(json.Me[0].$),
+    bloodPressure: json.Correlation
+      .filter(item => item.$.type === 'HKCorrelationTypeIdentifierBloodPressure')
+      .map(item => ({
+        date: new Date(item.$.creationDate),
+        systolic: +(item.Record.find(record => record.$.type === 'HKQuantityTypeIdentifierBloodPressureSystolic')?.$.value || 0),
+        diastolic: +(item.Record.find(record => record.$.type === 'HKQuantityTypeIdentifierBloodPressureDiastolic')?.$.value || 0),
+      }))
   }
 }
 

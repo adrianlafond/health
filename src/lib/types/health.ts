@@ -10,10 +10,17 @@ export interface User {
   bloodType?: 'A+' | 'A-' | 'B+' | 'B-' | 'O+' | 'O-' | 'AB+' | 'AB-'
 }
 
+export interface BloodPressure {
+  date: Date
+  systolic: number
+  diastolic: number
+}
+
 export interface Health {
   error: false
   date: Date
   user: User
+  bloodPressure: BloodPressure[]
 }
 
 export type HealthSuccess = {

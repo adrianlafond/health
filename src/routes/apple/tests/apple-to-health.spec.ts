@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { appleToHealth } from '../apple-to-health';
+import type { Health, HealthError } from '$lib/types/health';
 
 const testXmlStart = `
 <?xml version="1.0" encoding="UTF-8"?>
@@ -80,6 +81,41 @@ describe('appleToHealth()', () => {
       expect(data.error).toBe(true)
       const message = data.error ? data.message : null
       expect(typeof message).toBe('string')
+    })
+  })
+  describe('health data', () => {
+    let data: Health
+    beforeEach(async () => {
+      const json = await appleToHealth(testXml)
+      if (json.error) {
+        throw new Error(json.message);
+      }
+      data = json
+    })
+
+    describe('user', () => {
+      it('returns a date of birth with year, month, date', () => {
+        expect(data.user.dob?.year).toBe(1999)
+        expect(data.user.dob?.month).toBe(10)
+        expect(data.user.dob?.date).toBe(31)
+      })
+      it('returns a gender', () => {
+        expect(data.user.gender).toBe('male')
+      })
+      it('returns a blood type', () => {
+        expect(data.user.bloodType).toBe('A-')
+      })
+    })
+    describe('blood pressure', () => {
+      it('returns a blood pressure value for each entry', () => {
+        expect(data.bloodPressure).toHaveLength(2)
+      })
+      it('returns correct systolic and diastlic values', () => {
+        expect(data.bloodPressure[0].systolic).toBe(113)
+        expect(data.bloodPressure[0].diastolic).toBe(66)
+        expect(data.bloodPressure[1].systolic).toBe(97)
+        expect(data.bloodPressure[1].diastolic).toBe(68)
+      })
     })
   })
 })
